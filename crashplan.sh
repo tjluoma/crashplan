@@ -83,7 +83,7 @@ function unloadCrashplan {
 #
 ####|####|####|####|####|####|####|####|####|####|####|####|####|####|####
 
-ACTION=toggle
+ACTION=status
 
 for ARGS in "$@"
 do
@@ -96,6 +96,10 @@ do
 		-u|--unload)
 					ACTION='unload'
 					shift
+		;;
+
+		-t|--toggle)
+					ACTION='toggle'
 		;;
 
 		-*|--*)
@@ -117,7 +121,7 @@ case "$ACTION" in
 				loadCrashplan
 	;;
 
-	*)
+	toggle)
 				${SUDO} /bin/launchctl list | egrep -q 'com.crashplan.engine$'
 
 				EXIT="$?"
@@ -133,6 +137,25 @@ case "$ACTION" in
 
 						loadCrashplan
 				fi
+	;;
+
+
+	*)
+
+				${SUDO} /bin/launchctl list | egrep -q 'com.crashplan.engine$'
+
+				EXIT="$?"
+
+				if [ "$EXIT" = "0" ]
+				then
+						# loaded, needs to be unloaded
+						echo "$NAME: CrashPlan is loaded"
+				else
+						# unloaded, needs to be loaded
+						echo "$NAME: CrashPlan is unloaded"
+				fi
+
+				exit 0
 	;;
 
 esac
